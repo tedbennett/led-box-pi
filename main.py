@@ -2,16 +2,19 @@ from websocket import WebSocketApp
 import json
 import _thread as thread
 import sys
+from board import Board
 
 
 class WebSocketClient():
     def __init__(self, host):
         self.socket = WebSocketApp(host,
-                         on_open=lambda ws: self._on_open(ws),
-                         on_close=lambda ws: self._on_close(ws),
-                         on_message=lambda ws, msg: self._on_message(ws, msg),
-                         on_error=lambda ws, msg: self._on_error(ws, msg)
-                         )
+                                   on_open=lambda ws: self._on_open(ws),
+                                   on_close=lambda ws: self._on_close(ws),
+                                   on_message=lambda ws, msg: self._on_message(
+                                       ws, msg),
+                                   on_error=lambda ws, msg: self._on_error(
+                                       ws, msg)
+                                   )
 
     def start(self):
         self.socket.run_forever()
@@ -21,7 +24,9 @@ class WebSocketClient():
         print(dict)
         if dict["pattern"] is not None and len(dict["pattern"]) == 64:
             print("Pattern accepted")
+            # Do something with the pattern
 
+            # Let server know we received it ok
             def pattern_accepted(*args):
                 message = {
                     "type": "pattern accepted",
@@ -47,35 +52,13 @@ class WebSocketClient():
 
 
 if __name__ == "__main__":
-    box_name = sys.argv[1]    
+    box_name = sys.argv[1]
     debug = False if len(sys.argv) <= 2 else sys.argv[2]
     host = "ws://localhost:5000" if debug else "ws://led-box.herokuapp.com/"
     websocket = WebSocketClient(host)
-    
+
     websocket.start()
 
-
-# @socketio.on('message')
-# def test_message(message):
-#     if message['type'] == 'pattern':
-#         pattern = message['data'].split(",")
-#         board.set_pattern(pattern)
-
-
-# @socketio.on('connect')
-# def connect():
-#     # On connect, flash the pattern green in new thread
-#     emit('my response', {'data': 'Connected', 'count': 0})
-
-
-# @socketio.on('disconnect')
-# def disconnect():
-#     # On connect, flash the pattern red in new thread
-#     print('Client disconnected')
-
-
-# if __name__ == "__main__":
-#     # Fetch the environment variable (so it works on Heroku):
-#     socketio.run(app, host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
-#     while True:
-#         
+    board = Board()
+    while True:
+        thread.start_new_thread(board.draw, ())

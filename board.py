@@ -6,7 +6,7 @@ class Board:
     def __init__(self):
         self.device = ws2812(width=8, height=8)
         self.size = 64
-        self.pattern = ["#000000"] * self.size
+        self.pattern = ["#111111"] * self.size
 
     def set_pattern(self, pattern):
         if len(pattern) != self.size:

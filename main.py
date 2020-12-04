@@ -2,6 +2,7 @@ from websocket import WebSocketApp
 import json
 import _thread as thread
 import sys
+import time
 from board import Board
 
 
@@ -54,6 +55,12 @@ class WebSocketClient():
             }
             self.socket.send(json.dumps(message))
         thread.start_new_thread(run, ())
+
+        def connect_pattern(*args):
+            board.set_pattern(["#008000"] * 64)
+            time.sleep(0.1)
+            board.set_pattern(["#000000"] * 64)
+        thread.start_new_thread(connect_pattern, ())
 
 
 if __name__ == "__main__":
